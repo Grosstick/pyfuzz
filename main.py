@@ -11,7 +11,7 @@ import argparse
 import sys
 from pathlib import Path
 
-# Add parent directory to path so we can import pyfuzz
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 from pyfuzz.core.engine import FuzzingEngine
@@ -21,17 +21,14 @@ from pyfuzz.targets.http_target import create_target_function
 def print_banner():
     """Print a cool banner because why not."""
     banner = """
-    ╔═══════════════════════════════════════════════════╗
-    ║                                                   ║
-    ║   ██████╗ ██╗   ██╗███████╗██╗   ██╗███████╗███████╗║
-    ║   ██╔══██╗╚██╗ ██╔╝██╔════╝██║   ██║╚══███╔╝╚══███╔╝║
-    ║   ██████╔╝ ╚████╔╝ █████╗  ██║   ██║  ███╔╝   ███╔╝ ║
-    ║   ██╔═══╝   ╚██╔╝  ██╔══╝  ██║   ██║ ███╔╝   ███╔╝  ║
-    ║   ██║        ██║   ██║     ╚██████╔╝███████╗███████╗║
-    ║   ╚═╝        ╚═╝   ╚═╝      ╚═════╝ ╚══════╝╚══════╝║
-    ║                                                   ║
-    ║      Beginner Fuzzing Framework v0.1              ║
-    ╚═══════════════════════════════════════════════════╝
+    ██████╗ ██╗   ██╗███████╗██╗   ██╗███████╗███████╗
+    ██╔══██╗╚██╗ ██╔╝██╔════╝██║   ██║╚══███╔╝╚══███╔╝
+    ██████╔╝ ╚████╔╝ █████╗  ██║   ██║  ███╔╝   ███╔╝
+    ██╔═══╝   ╚██╔╝  ██╔══╝  ██║   ██║ ███╔╝   ███╔╝
+    ██║        ██║   ██║     ╚██████╔╝███████╗███████╗
+    ╚═╝        ╚═╝   ╚═╝      ╚═════╝ ╚══════╝╚══════╝
+
+    ═══ Beginner Fuzzing Framework v0.1 ═══
     """
     print(banner)
 
@@ -45,12 +42,12 @@ def create_default_seeds(seeds_dir: Path):
     """
     seeds_dir.mkdir(parents=True, exist_ok=True)
     
-    # Check if there are already seeds
+
     existing = list(seeds_dir.iterdir())
     if existing:
         return
     
-    # Create some basic JSON seeds
+
     seeds = {
         "simple.json": b'{"value": 42}',
         "nested.json": b'{"a": {"b": {"c": 1}}}',
@@ -130,7 +127,7 @@ Examples:
     
     print_banner()
     
-    # Setup
+
     seeds_dir = Path(args.seeds)
     crashes_dir = Path(args.crashes)
     
@@ -145,14 +142,14 @@ Examples:
         print("[!] Dry run mode - not fuzzing")
         return
     
-    # Create default seeds if needed
+
     create_default_seeds(seeds_dir)
     print("")
     
-    # Create target function
+
     target_func = create_target_function(args.target, args.method)
     
-    # Create and run engine
+
     engine = FuzzingEngine(
         target_func=target_func,
         seeds_dir=str(seeds_dir),

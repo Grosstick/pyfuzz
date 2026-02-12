@@ -48,7 +48,7 @@ class CrashInfo:
         We hash the crash type and first 3 lines of stack trace.
         This helps deduplicate crashes that have the same root cause.
         """
-        # Get first 3 lines of stack trace for deduplication
+
         trace_lines = self.stack_trace.split('\n')[:3]
         trace_key = '\n'.join(trace_lines)
         
@@ -83,7 +83,7 @@ class CrashMonitor:
         self.crashes_dir = Path(crashes_dir)
         self.crashes_dir.mkdir(parents=True, exist_ok=True)
         
-        # Track seen crashes for deduplication
+
         self.seen_crashes = set()
     
     def execute_with_monitoring(
@@ -112,7 +112,7 @@ class CrashMonitor:
         try:
             result = func(input_data, *args, **kwargs)
             
-            # Check if execution took too long
+
             elapsed = time.time() - start_time
             if elapsed > self.timeout:
                 crash_info = CrashInfo(
@@ -145,7 +145,7 @@ class CrashMonitor:
                 input_data=input_data,
             )
         
-        # Save crash if it's new
+
         if crash_info and crash_info.crash_hash not in self.seen_crashes:
             self._save_crash(crash_info)
             self.seen_crashes.add(crash_info.crash_hash)
@@ -158,11 +158,11 @@ class CrashMonitor:
         """
         base_name = f"crash_{crash.crash_hash}"
         
-        # Save the crashing input
+
         input_file = self.crashes_dir / f"{base_name}.input"
         input_file.write_bytes(crash.input_data)
         
-        # Save crash details
+
         info_file = self.crashes_dir / f"{base_name}.txt"
         info_file.write_text(
             f"Crash Type: {crash.crash_type}\n"

@@ -92,27 +92,27 @@ class FuzzingEngine:
         self.seeds_dir = Path(seeds_dir)
         self.crashes_dir = Path(crashes_dir)
         
-        # Create directories if they don't exist
+
         self.seeds_dir.mkdir(parents=True, exist_ok=True)
         self.crashes_dir.mkdir(parents=True, exist_ok=True)
         
-        # Initialize mutator
+
         if use_dictionary:
             self.mutator = DictionaryMutator()
         else:
             self.mutator = Mutator()
         
-        # Corpus of inputs - start with seeds
+
         self.corpus: List[bytes] = []
         self._load_seeds()
         
-        # Track unique coverage paths
+
         self.seen_coverage: Set[str] = set()
         
-        # Track unique crashes (by hash)
+
         self.seen_crashes: Set[str] = set()
         
-        # Statistics
+
         self.stats = FuzzStats()
     
     def _load_seeds(self):
@@ -123,7 +123,6 @@ class FuzzingEngine:
         The fuzzer will mutate these to try to find bugs.
         """
         if not self.seeds_dir.exists():
-            # No seeds directory, start with a default input
             self.corpus.append(b"test")
             return
         
@@ -168,16 +167,16 @@ class FuzzingEngine:
         crash_hash = self._hash_crash(result)
         
         if crash_hash in self.seen_crashes:
-            return  # Already have this crash
+            return
         
         self.seen_crashes.add(crash_hash)
         self.stats.unique_crashes += 1
         
-        # Save the crashing input
+
         crash_file = self.crashes_dir / f"crash_{crash_hash}.bin"
         crash_file.write_bytes(result.input_data)
         
-        # Also save info about the crash
+
         info_file = self.crashes_dir / f"crash_{crash_hash}.txt"
         info_file.write_text(
             f"Crash found at: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
@@ -239,25 +238,25 @@ class FuzzingEngine:
         
         try:
             for i in range(max_iterations):
-                # 1. Pick a seed input
+
                 seed = self._pick_input()
                 
-                # 2. Mutate it
+
                 mutated = self.mutator.mutate(seed)
                 
-                # 3. Run against target
+
                 result = self.target_func(mutated)
                 
                 self.stats.total_executions += 1
                 
-                # 4. Check for crash
+
                 if result.crashed:
                     self._save_crash(result)
                 
-                # 5. Check for new coverage
+
                 self._check_new_coverage(result)
                 
-                # Print status periodically
+
                 if i % print_interval == 0:
                     self._print_status()
         

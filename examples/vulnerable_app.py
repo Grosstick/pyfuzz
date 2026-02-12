@@ -53,16 +53,12 @@ def parse_json():
     try:
         data = request.get_data()
         
-        # Bug: We decode as JSON but don't catch all errors
         parsed = json.loads(data)
         
-        # Bug: Accessing keys without checking if they exist
         if "value" in parsed:
-            # Bug: Type confusion - what if value isn't a number?
             result = parsed["value"] * 2
             return jsonify({"result": result})
         
-        # Bug: Recursion depth issue with deeply nested JSON
         def count_depth(obj, depth=0):
             if depth > 100:
                 raise RecursionError("Too deep!")
@@ -76,10 +72,10 @@ def parse_json():
         return jsonify({"parsed": True, "depth": depth})
         
     except json.JSONDecodeError as e:
-        # Intentionally return detailed error (information disclosure)
+
         return jsonify({"error": str(e), "input": data.decode(errors="replace")}), 400
     except Exception as e:
-        # Bug: Return 500 with full exception details
+
         return jsonify({"error": str(e), "type": type(e).__name__}), 500
 
 
@@ -98,16 +94,14 @@ def calculate():
         b = data.get("b", 0)
         op = data.get("op", "add")
         
-        # Bug: No type checking - what if a or b are strings?
+
         if op == "add":
             result = a + b
         elif op == "multiply":
             result = a * b
         elif op == "divide":
-            # Bug: Division by zero not handled
             result = a / b
         elif op == "power":
-            # Bug: Can cause very large numbers or hang
             result = a ** b
         else:
             result = 0
@@ -141,7 +135,7 @@ def ping():
         else:
             cmd = f"ping -c 1 {host}"
         
-        # Limit command execution for safety in testing
+
         result = subprocess.run(
             cmd,
             shell=True,
@@ -176,12 +170,11 @@ def read_file():
         # Bug: Path traversal vulnerability
         # Attacker could send: {"filename": "../../../etc/passwd"}
         
-        # Weak "protection" that's easily bypassed
+
         if ".." in filename:
-            # Bug: Can be bypassed with encoding or other tricks
             return jsonify({"error": "Nice try!"}), 403
         
-        # Still vulnerable to absolute paths and other tricks
+
         base_dir = os.path.dirname(__file__)
         filepath = os.path.join(base_dir, "data", filename)
         
@@ -215,12 +208,12 @@ def regex_match():
         # Example evil pattern: (a+)+b
         # With input: "aaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         
-        # Adding a timeout would be smart, but we "forgot"
+
         compiled = re.compile(pattern)
         matches = compiled.findall(text)
         
         return jsonify({
-            "matches": matches[:10],  # Limit response size
+            "matches": matches[:10],
             "count": len(matches)
         })
         
@@ -248,5 +241,5 @@ if __name__ == '__main__':
     print("Starting server on http://localhost:5000")
     print("=" * 50)
     
-    # Debug mode intentionally on (more info disclosure)
+
     app.run(debug=True, port=5000)

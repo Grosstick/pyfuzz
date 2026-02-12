@@ -35,7 +35,7 @@ class HttpTargetConfig:
         if self.headers is None:
             self.headers = {}
         
-        # Set content type if not already set
+
         if "Content-Type" not in self.headers:
             self.headers["Content-Type"] = self.content_type
 
@@ -61,7 +61,7 @@ class HttpTarget:
         self.config = config
         self.session = requests.Session()
         
-        # Keep track of seen response sizes for anomaly detection
+
         self.response_sizes = []
     
     def run(self, data: bytes) -> FuzzResult:
@@ -78,7 +78,7 @@ class HttpTarget:
         start_time = time.time()
         
         try:
-            # Send the request
+
             if self.config.method.upper() == "POST":
                 response = self.session.post(
                     self.config.url,
@@ -87,7 +87,6 @@ class HttpTarget:
                     timeout=self.config.timeout,
                 )
             elif self.config.method.upper() == "GET":
-                # For GET, we might put the data in query params
                 response = self.session.get(
                     self.config.url,
                     params={"data": data.decode(errors="ignore")},
@@ -106,13 +105,12 @@ class HttpTarget:
             result.execution_time = time.time() - start_time
             result.response_data = response.content
             
-            # Check for server errors
+
             if response.status_code >= 500:
                 result.crashed = True
                 result.error_message = f"Server error: HTTP {response.status_code}"
             
-            # Generate a simple coverage hash based on response
-            # (In a real fuzzer, we'd instrument the target for actual coverage)
+            # Pseudo-coverage based on response characteristics
             result.coverage_hash = self._generate_coverage_hash(response)
                 
         except requests.exceptions.Timeout:
@@ -142,10 +140,9 @@ class HttpTarget:
         A real coverage-guided fuzzer would instrument the target
         to track which code paths are executed.
         """
-        # Use status code + response size range + content patterns
-        size_bucket = len(response.content) // 100  # Group by 100-byte buckets
+        size_bucket = len(response.content) // 100
         
-        # Check for error patterns in response
+
         error_patterns = [
             b"error",
             b"exception",

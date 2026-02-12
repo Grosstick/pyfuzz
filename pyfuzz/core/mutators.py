@@ -13,8 +13,7 @@ import random
 import struct
 from typing import List
 
-# "Interesting" values that often trigger bugs
-# These are boundary values that cause issues in parsers
+# Boundary values known to trigger integer-related bugs
 INTERESTING_8 = [0, 1, 127, 128, 255]
 INTERESTING_16 = [0, 1, 32767, 32768, 65535]
 INTERESTING_32 = [0, 1, 2147483647, 2147483648, 4294967295]
@@ -51,7 +50,7 @@ class Mutator:
         if len(data) == 0:
             return data
         
-        # Pick a random mutation strategy
+
         strategies = [
             self._bit_flip,
             self._byte_flip,
@@ -99,19 +98,16 @@ class Mutator:
         data = bytearray(data)
         pos = random.randint(0, len(data) - 1)
         
-        # Pick a random interesting value type
+
         choice = random.randint(0, 2)
         
         if choice == 0 and len(data) >= 1:
-            # 8-bit interesting value
             data[pos] = random.choice(INTERESTING_8)
         elif choice == 1 and len(data) >= 2:
-            # 16-bit interesting value
             val = random.choice(INTERESTING_16)
             if pos + 1 < len(data):
                 data[pos:pos+2] = struct.pack('<H', val)
         elif choice == 2 and len(data) >= 4:
-            # 32-bit interesting value
             val = random.choice(INTERESTING_32)
             if pos + 3 < len(data):
                 data[pos:pos+4] = struct.pack('<I', val)
@@ -180,7 +176,7 @@ class DictionaryMutator(Mutator):
         """
         super().__init__(seed)
         
-        # Default dictionary with common interesting strings
+
         self.dictionary = dictionary or [
             b'{{',
             b'}}',
@@ -206,7 +202,7 @@ class DictionaryMutator(Mutator):
         """
         Apply mutation, sometimes using dictionary tokens.
         """
-        # 30% chance to use dictionary insertion
+
         if random.random() < 0.3:
             return self._insert_dictionary_token(data)
         
@@ -223,7 +219,7 @@ class DictionaryMutator(Mutator):
         return bytes(data)
 
 
-# Quick test when running this file directly
+
 if __name__ == "__main__":
     print("Testing mutator...")
     

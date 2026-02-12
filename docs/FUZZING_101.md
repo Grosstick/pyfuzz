@@ -4,7 +4,7 @@ notes i'm writing while learning about fuzzing. mostly from reading AFL docs and
 
 ## What even is Fuzzing?
 
-So basically fuzzing is when you throw random (or semi-random) data at a program to see if it breaks. Sounds dumb but apparently it works really well?
+So basically fuzzing is when you throw random (or semi-random) data at a program to see if it breaks.
 
 The loop is pretty simple:
 ```
@@ -14,8 +14,6 @@ The loop is pretty simple:
 4. if crash -> save it
 5. goto 1
 ```
-
-thats it. thats the whole thing lol
 
 ## Types of Fuzzing
 
